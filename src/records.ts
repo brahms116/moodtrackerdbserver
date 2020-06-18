@@ -4,6 +4,18 @@ import Records,{Irecords} from './models/Records'
 const router = express.Router()
 
 
+
+router.get('/batch/:limit',async (req,res)=>{
+    try {
+        const limit = req.params.limit;
+        const records =  await Records.find({userID:req.body.userID}).sort({createdAt:-1}).limit(+limit)
+        return res.status(200).send(records)
+
+    } catch (error) {
+        return res.status(400).send(error)
+    }
+})
+
 router.get('/id/:id' ,async(req,res)=>{
     try {
         const record = await Records.findById(req.params.id)
