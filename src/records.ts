@@ -4,6 +4,24 @@ import Records,{Irecords} from './models/Records'
 const router = express.Router()
 
 
+router.get('/id/:id' ,async(req,res)=>{
+    try {
+        const record = await Records.findById(req.params.id)
+
+        if(!record){
+            return res.status(400).send("document does not exist")
+        }else{
+            if (record.userID!=req.body.userID){
+                return res.status(403).send("Access Denied")
+            }
+            return res.status(200).send(record)
+        }
+
+    } catch (error) {
+        return res.status(400).send(error)
+    }
+})
+
 router.post('/',async(req,res)=>{
     try {
         const records = {
@@ -14,7 +32,7 @@ router.post('/',async(req,res)=>{
 
         const newRecords = new Records(records);        
         const result = await newRecords.save()
-        return res.status(200).send(result)       
+        return res.status(201).send(result)       
         
     } catch (error) {
         return res.status(400).send(error)
