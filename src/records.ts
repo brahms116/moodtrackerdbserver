@@ -1,12 +1,16 @@
 import express from 'express'
-import dotenv from'dotenv';
 import Records,{Irecords} from './models/Records'
 import Cryptr from 'cryptr';
+import dotenv from 'dotenv'
 
 
 dotenv.config()
+
+
 const cryptr = new Cryptr(process.env.JWT_SECRET as string)
 
+
+console.log(process.env.JWT_SECRET as string)
 const router = express.Router()
 
 
@@ -16,8 +20,14 @@ router.get('/batch/:limit',async (req,res)=>{
         const limit = req.params.limit;
         const records =  await Records.find({userID:req.body.userID}).sort({createdAt:-1}).limit(+limit)
         records.forEach(x=>{
-            x.description= cryptr.decrypt(x.description)
+            try {
+                x.description=cryptr.decrypt(x.description)                
+            } catch (error) {
+                return 
+            }                
+            //console.log(x.description)
         })
+        //console.log(records)
         return res.status(200).send(records)
 
     } catch (error) {
